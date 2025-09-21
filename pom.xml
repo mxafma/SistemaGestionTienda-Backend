@@ -19,7 +19,9 @@
 
     <properties>
         <java.version>17</java.version>
-        <spring.datasource.driver-class-name>com.mysql.cj.jdbc.Driver</spring.datasource.driver-class-name>
+
+
+
     </properties>
 
     <dependencies>
