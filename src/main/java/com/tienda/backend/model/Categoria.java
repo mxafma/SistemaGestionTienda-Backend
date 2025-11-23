@@ -11,22 +11,19 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "usuarios")
+@Table(name = "categorias")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Usuario {
-
+public class Categoria {
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+    
     @Column(nullable = false, unique = true)
-    private String username;
-
-    @Column(nullable = false)
-    private String password;
-
-    @Column(nullable = false)
-    private String role;
+    private String nombre;
+    
+    @Column
+    private String descripcion;
 }

@@ -1,9 +1,20 @@
 package com.tienda.backend.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "proveedores")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Proveedor {
     
     @Id
@@ -24,65 +35,4 @@ public class Proveedor {
     
     @Column
     private String direccion;
-
-    // Constructores
-    public Proveedor() {
-    }
-
-    public Proveedor(String name, String rut, String email, String phone, String direccion) {
-        this.name = name;
-        this.rut = rut;
-        this.email = email;
-        this.phone = phone;
-        this.direccion = direccion;
-    }
-
-    // Getters y Setters
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getRut() {
-        return rut;
-    }
-
-    public void setRut(String rut) {
-        this.rut = rut;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public String getDireccion() {
-        return direccion;
-    }
-
-    public void setDireccion(String direccion) {
-        this.direccion = direccion;
-    }
 }
