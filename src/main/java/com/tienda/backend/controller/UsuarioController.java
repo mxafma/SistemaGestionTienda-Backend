@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.tienda.backend.model.Usuario;
-import com.tienda.backend.repository.UsuarioRepository;
+import com.tienda.backend.service.UsuarioService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -31,10 +31,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "Usuarios", description = "API para gestión de usuarios del sistema")
 public class UsuarioController {
 
-    private final UsuarioRepository usuarioRepository;
+    private final UsuarioService usuarioService;
 
-    public UsuarioController(UsuarioRepository usuarioRepository) {
-        this.usuarioRepository = usuarioRepository;
+    public UsuarioController(UsuarioService usuarioService) {
+        this.usuarioService = usuarioService;
     }
 
     @GetMapping
@@ -44,7 +44,7 @@ public class UsuarioController {
         @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
     public ResponseEntity<List<Usuario>> getAllUsuarios() {
-        List<Usuario> usuarios = usuarioRepository.findAll();
+        List<Usuario> usuarios = usuarioService.findAll();
         return ResponseEntity.ok(usuarios);
     }
 
@@ -55,7 +55,7 @@ public class UsuarioController {
         @ApiResponse(responseCode = "404", description = "Usuario no encontrado")
     })
     public ResponseEntity<?> getUsuarioById(@PathVariable Long id) {
-        Optional<Usuario> usuario = usuarioRepository.findById(id);
+        Optional<Usuario> usuario = usuarioService.findById(id);
         if (usuario.isPresent()) {
             return ResponseEntity.ok(usuario.get());
         } else {
@@ -73,7 +73,7 @@ public class UsuarioController {
     })
     public ResponseEntity<?> createUsuario(@RequestBody Usuario usuario) {
         try {
-            Usuario nuevoUsuario = usuarioRepository.save(usuario);
+            Usuario nuevoUsuario = usuarioService.save(usuario);
             Map<String, Object> response = new HashMap<>();
             response.put("id", nuevoUsuario.getId());
             response.put("message", "Usuario creado exitosamente");
@@ -93,14 +93,15 @@ public class UsuarioController {
         @ApiResponse(responseCode = "400", description = "Datos de entrada inválidos")
     })
     public ResponseEntity<?> updateUsuario(@PathVariable Long id, @RequestBody Usuario usuario) {
-        Optional<Usuario> usuarioExistente = usuarioRepository.findById(id);
+        Optional<Usuario> usuarioExistente = usuarioService.findById(id);
         if (usuarioExistente.isPresent()) {
             try {
                 Usuario usuarioActualizado = usuarioExistente.get();
-                usuarioActualizado.setUsername(usuario.getUsername());
+                usuarioActualizado.setName(usuario.getName());
+                usuarioActualizado.setEmail(usuario.getEmail());
+                usuarioActualizado.setPhone(usuario.getPhone());
                 usuarioActualizado.setPassword(usuario.getPassword());
-                usuarioActualizado.setRole(usuario.getRole());
-                usuarioRepository.save(usuarioActualizado);
+                usuarioService.save(usuarioActualizado);
                 return ResponseEntity.ok(usuarioActualizado);
             } catch (Exception e) {
                 Map<String, String> error = new HashMap<>();
@@ -121,9 +122,9 @@ public class UsuarioController {
         @ApiResponse(responseCode = "404", description = "Usuario no encontrado")
     })
     public ResponseEntity<?> deleteUsuario(@PathVariable Long id) {
-        Optional<Usuario> usuario = usuarioRepository.findById(id);
+        Optional<Usuario> usuario = usuarioService.findById(id);
         if (usuario.isPresent()) {
-            usuarioRepository.deleteById(id);
+            usuarioService.deleteById(id);
             Map<String, String> response = new HashMap<>();
             response.put("message", "Usuario eliminado exitosamente");
             return ResponseEntity.ok(response);
