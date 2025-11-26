@@ -31,6 +31,8 @@ public class SecurityConfig {
                 .requestMatchers("/api/auth/**").permitAll()
                 // Only allow ADMIN role to delete compras
                 .requestMatchers(HttpMethod.DELETE, "/api/compras/**").hasRole("ADMIN")
+                // Allow unauthenticated creation of usuarios (public user registration endpoint)
+                .requestMatchers(HttpMethod.POST, "/api/usuarios").permitAll()
                 // Require authentication for create/update operations on other API routes
                 .requestMatchers(HttpMethod.POST, "/api/**").authenticated()
                 .requestMatchers(HttpMethod.PUT, "/api/**").authenticated()
