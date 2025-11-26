@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -82,7 +83,23 @@ public class CompraController {
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Eliminar compra por ID")
-    public ResponseEntity<?> deleteCompra(@PathVariable Long id) {
+    public ResponseEntity<?> deleteCompra(@PathVariable Long id,
+                                          @RequestHeader(value = "Authorization", required = false) String authorization) {
+        // Validar header Authorization
+        if (authorization == null || !authorization.startsWith("Bearer ")) {
+            Map<String, String> err = new HashMap<>();
+            err.put("error", "Authorization header missing or invalid. Use: Authorization: Bearer <token>");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(err);
+        }
+
+        String token = authorization.substring(7).trim();
+        // Validación mínima del token usando TokenService
+        if (!com.tienda.backend.service.TokenService.isValid(token)) {
+            Map<String, String> err = new HashMap<>();
+            err.put("error", "Token inválido o expirado");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(err);
+        }
+
         try {
             compraService.deleteCompra(id);
             Map<String, String> resp = new HashMap<>();
