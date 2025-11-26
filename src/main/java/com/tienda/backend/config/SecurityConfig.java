@@ -27,9 +27,11 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
             .authorizeHttpRequests(auth -> auth
+                // Allow unauthenticated access to auth endpoints (login/register)
+                .requestMatchers("/api/auth/**").permitAll()
                 // Only allow ADMIN role to delete compras
                 .requestMatchers(HttpMethod.DELETE, "/api/compras/**").hasRole("ADMIN")
-                // Require authentication for create/update operations
+                // Require authentication for create/update operations on other API routes
                 .requestMatchers(HttpMethod.POST, "/api/**").authenticated()
                 .requestMatchers(HttpMethod.PUT, "/api/**").authenticated()
                 .anyRequest().permitAll()
