@@ -3,6 +3,7 @@ package com.tienda.backend.controller;
 
 import java.util.Optional;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.tienda.backend.dto.LoginRequest;
 import com.tienda.backend.dto.LoginResponse;
+import com.tienda.backend.dto.RegisterRequest;
 import com.tienda.backend.dto.UserDTO;
 import com.tienda.backend.model.Usuario;
 import com.tienda.backend.service.UsuarioService;
@@ -48,11 +50,22 @@ public class AuthController {
     }
     
     @PostMapping("/register")
-    public Usuario register(@RequestBody Usuario usuario) {
-        if (usuario.getRole() == null || usuario.getRole().trim().isEmpty()) {
+    public ResponseEntity<?> register(@RequestBody RegisterRequest req) {
+        try {
+            Usuario usuario = new Usuario();
+            usuario.setName(req.getName());
+            usuario.setEmail(req.getEmail());
+            usuario.setPhone(req.getPhone());
+            usuario.setPassword(req.getPassword());
+            // Force role to USER regardless of client input
             usuario.setRole("USER");
+
+            Usuario saved = usuarioService.save(usuario);
+            UserDTO userDto = new UserDTO(saved.getId(), saved.getName(), saved.getEmail(), saved.getPhone(), saved.getRole());
+            return ResponseEntity.status(HttpStatus.CREATED).body(userDto);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(java.util.Map.of("error", e.getMessage()));
         }
-        return usuarioService.save(usuario);
     }
 
     
