@@ -11,8 +11,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.tienda.backend.dto.LoginRequest;
+import com.tienda.backend.dto.LoginResponse;
+import com.tienda.backend.dto.UserDTO;
 import com.tienda.backend.model.Usuario;
 import com.tienda.backend.service.UsuarioService;
+import com.tienda.backend.util.JwtUtil;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -20,16 +23,25 @@ import com.tienda.backend.service.UsuarioService;
 public class AuthController {
 
     private final UsuarioService usuarioService;
+    private final JwtUtil jwtUtil;
 
-    public AuthController(UsuarioService usuarioService) {
+    public AuthController(UsuarioService usuarioService, JwtUtil jwtUtil) {
         this.usuarioService = usuarioService;
+        this.jwtUtil = jwtUtil;
     }
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
-        Optional<Usuario> user = usuarioService.login(request.getEmail(), request.getPassword());
-        if (user.isPresent()) {
-            return ResponseEntity.ok(user.get());
+        Optional<Usuario> userOpt = usuarioService.login(request.getEmail(), request.getPassword());
+        if (userOpt.isPresent()) {
+            Usuario user = userOpt.get();
+            if (user.getRole() == null || user.getRole().trim().isEmpty()) {
+                user.setRole("USER");
+            }
+            String token = jwtUtil.generateToken(user);
+            UserDTO userDto = new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getPhone(), user.getRole());
+            LoginResponse resp = new LoginResponse(token, user.getRole(), userDto);
+            return ResponseEntity.ok(resp);
         } else {
             return ResponseEntity.status(401).body("Email o contraseña incorrectos");
         }
@@ -37,6 +49,9 @@ public class AuthController {
     
     @PostMapping("/register")
     public Usuario register(@RequestBody Usuario usuario) {
+        if (usuario.getRole() == null || usuario.getRole().trim().isEmpty()) {
+            usuario.setRole("USER");
+        }
         return usuarioService.save(usuario);
     }
 

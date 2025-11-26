@@ -32,4 +32,7 @@ public class Usuario {
 
     @Column(nullable = false)
     private String password;
+
+    @Column
+    private String role; // e.g. 'USER' or 'ADMIN'
 }
